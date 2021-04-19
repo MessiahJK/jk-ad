@@ -10,8 +10,7 @@ import us.betahouse.ad.entity.AdPlan;
 import us.betahouse.ad.entity.AdUnit;
 import us.betahouse.ad.exception.AdException;
 import us.betahouse.ad.service.IAdUnitService;
-import us.betahouse.ad.vo.AdUnitRequest;
-import us.betahouse.ad.vo.AdUnitResponse;
+import us.betahouse.ad.vo.*;
 
 import java.util.Optional;
 
@@ -55,6 +54,21 @@ public class AdUnitServiceImpl implements IAdUnitService {
 
         return new AdUnitResponse(newAdUnit.getId(),
                 newAdUnit.getUnitName());
+    }
+
+    @Override
+    public AdUnitKeywordResponse createUnitKeyword(AdUnitKeywordRequest request) throws AdException {
+        return null;
+    }
+
+    @Override
+    public AdUnitItResponse createUnitIt(AdUnitItRequest request) throws AdException {
+        return null;
+    }
+
+    @Override
+    public AdUnitDistrictResponse createUnitDistrict(AdUnitDistrictRequest request) throws AdException {
+        return null;
     }
 
 }

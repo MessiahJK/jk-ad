@@ -13,6 +13,7 @@ public class AdUnitRequest {
     private Long planId;
     private String unitName;
 
+    //广告位类型
     private Integer positionType;
     private Long budget;
 
