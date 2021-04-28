@@ -6,14 +6,17 @@ import org.springframework.util.CollectionUtils;
 import us.betahouse.ad.constant.Constants;
 import us.betahouse.ad.dao.AdPlanRepository;
 import us.betahouse.ad.dao.AdUnitRepository;
+import us.betahouse.ad.dao.CreativeRepository;
 import us.betahouse.ad.dao.unit_condition.AdUnitDistrictRepository;
 import us.betahouse.ad.dao.unit_condition.AdUnitItRepository;
 import us.betahouse.ad.dao.unit_condition.AdUnitKeywordRepository;
+import us.betahouse.ad.dao.unit_condition.CreativeUnitRepository;
 import us.betahouse.ad.entity.AdPlan;
 import us.betahouse.ad.entity.AdUnit;
 import us.betahouse.ad.entity.unit_condition.AdUnitDistrict;
 import us.betahouse.ad.entity.unit_condition.AdUnitIt;
 import us.betahouse.ad.entity.unit_condition.AdUnitKeyword;
+import us.betahouse.ad.entity.unit_condition.CreativeUnit;
 import us.betahouse.ad.exception.AdException;
 import us.betahouse.ad.service.IAdUnitService;
 import us.betahouse.ad.vo.*;
@@ -31,18 +34,23 @@ public class AdUnitServiceImpl implements IAdUnitService {
     private final AdUnitItRepository unitItRepository;
     private final AdUnitDistrictRepository unitDistrictRepository;
 
+    private final CreativeRepository creativeRepository;
+    private final CreativeUnitRepository creativeUnitRepository;
+
 
     @Autowired
     public AdUnitServiceImpl(AdPlanRepository planRepository,
                              AdUnitRepository unitRepository,
                              AdUnitKeywordRepository unitKeywordRepository,
                              AdUnitItRepository unitItRepository,
-                             AdUnitDistrictRepository unitDistrictRepository) {
+                             AdUnitDistrictRepository unitDistrictRepository, CreativeRepository creativeRepository, CreativeUnitRepository creativeUnitRepository) {
         this.planRepository = planRepository;
         this.unitRepository = unitRepository;
         this.unitKeywordRepository = unitKeywordRepository;
         this.unitItRepository = unitItRepository;
         this.unitDistrictRepository = unitDistrictRepository;
+        this.creativeRepository = creativeRepository;
+        this.creativeUnitRepository = creativeUnitRepository;
     }
 
     @Override
@@ -143,6 +151,34 @@ public class AdUnitServiceImpl implements IAdUnitService {
         return new AdUnitDistrictResponse(ids);
     }
 
+    @Override
+    public CreativeUnitResponse createCreativeUnit(
+            CreativeUnitRequest request) throws AdException {
+
+        List<Long> unitIds = request.getUnitItems().stream()
+                .map(CreativeUnitRequest.CreativeUnitItem::getUnitId)
+                .collect(Collectors.toList());
+        List<Long> creativeIds = request.getUnitItems().stream()
+                .map(CreativeUnitRequest.CreativeUnitItem::getCreativeId)
+                .collect(Collectors.toList());
+
+        if (!(isRelatedUnitExist(unitIds) && isRelatedUnitExist(creativeIds))) {
+            throw new AdException(Constants.ErrorMsg.REQUEST_PARAM_ERROR);
+        }
+
+        List<CreativeUnit> creativeUnits = new ArrayList<>();
+        request.getUnitItems().forEach(i -> creativeUnits.add(
+                new CreativeUnit(i.getCreativeId(), i.getUnitId())
+        ));
+
+        List<Long> ids = creativeUnitRepository.saveAll(creativeUnits)
+                .stream()
+                .map(CreativeUnit::getId)
+                .collect(Collectors.toList());
+
+        return new CreativeUnitResponse(ids);
+    }
+
     private boolean isNotRelatedUnitExit(List<Long> unitIds) {
         return !isRelatedUnitExist(unitIds);
     }
@@ -154,5 +190,13 @@ public class AdUnitServiceImpl implements IAdUnitService {
         //去重对比
         return unitRepository.findAllById(unitIds).size() == new HashSet<>(unitIds).size();
     }
+    private boolean isRelatedCreativeExist(List<Long> creativeIds) {
 
+        if (CollectionUtils.isEmpty(creativeIds)) {
+            return false;
+        }
+
+        return creativeRepository.findAllById(creativeIds).size() ==
+                new HashSet<>(creativeIds).size();
+    }
 }
