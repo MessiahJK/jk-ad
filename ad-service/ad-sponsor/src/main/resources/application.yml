@@ -17,6 +17,7 @@ spring:
     url: jdbc:mysql://127.0.0.1:3306/jk_ad_data?autoReconnect=true&serverTimezone=Asia/Shanghai&useSSL=false&characterEncoding=utf8
     username: root
     password: root
+    driver-class-name: com.mysql.cj.jdbc.Driver
     tomcat:
       max-active: 4
       min-idle: 2
