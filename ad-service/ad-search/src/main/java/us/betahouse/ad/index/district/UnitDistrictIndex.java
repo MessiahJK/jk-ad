@@ -15,8 +15,8 @@ import java.util.concurrent.ConcurrentSkipListSet;
 @Component
 public class UnitDistrictIndex implements IndexAware<String, Set<Long>> {
 
-    private static Map<String, Set<Long>> districtUnitMap;
-    private static Map<Long, Set<String>> unitDistrictMap;
+    private static final Map<String, Set<Long>> districtUnitMap;
+    private static final Map<Long, Set<String>> unitDistrictMap;
 
     static {
         districtUnitMap = new ConcurrentHashMap<>();
